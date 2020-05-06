@@ -7,6 +7,4 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'JsonMapper' => array($vendorDir . '/netresearch/jsonmapper/src'),
-    'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
-    'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
 );

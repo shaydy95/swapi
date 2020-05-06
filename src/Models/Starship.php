@@ -4,7 +4,9 @@
 namespace SwapiClient\Models;
 
 
-class Starship
+use GuzzleHttp\Psr7\Request;
+
+class Starship extends Request
 {
     /** @var string */
     public $name;

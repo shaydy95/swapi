@@ -4,6 +4,7 @@
 namespace SwapiClient\Endpoints;
 
 
+use GuzzleHttp\Exception\RequestException;
 use SwapiClient\Models\Collection;
 use SwapiClient\Models\Planet;
 
@@ -18,13 +19,12 @@ class PlanetsEndpoint extends Endpoints
      */
     public function get(int $id)
     {
-        $request = $this->http->createRequest("GET", sprintf("planets/%d/", $id));
-        $response = $this->http->send($request);
-
-        if ($response->getStatusCode() == 200) {
-            return $this->hydrateOne($response->json(), new Planet);
+        try {
+            $response = $this->http->request("GET", sprintf("planets/%d/", $id));
+            return $this->hydrateOne(json_decode($response->getBody()), new Planet());
+        } catch (RequestException $e) {
+            echo $e->getMessage() . "\n";
+            echo $e->getRequest()->getMethod();
         }
-
-        return $this->handleResponse($response, $request);
     }
 }

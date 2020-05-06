@@ -3,11 +3,13 @@
 
 namespace SwapiClient\Endpoints;
 
-use Guzzle\Http\Client;
-use Guzzle\Http\Message\Response;
-use Guzzle\Http\Message\Request;
+
+use GuzzleHttp\Client as Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use JsonMapper;
 use phpDocumentor\Reflection\Types\Null_;
+use Psr\Http\Message\ResponseInterface;
 use SwapiClient\Models\Collection;
 
 
@@ -19,6 +21,11 @@ class Endpoints
     /** @var \JsonMapper */
     protected $mapper;
 
+    /**
+     * Endpoints constructor.
+     * @param Client $http
+     * @param JsonMapper $mapper
+     */
     public function __construct(Client $http, JsonMapper $mapper)
     {
         $this->http = $http;
@@ -32,11 +39,10 @@ class Endpoints
 
     /**
      * @param Response $response
-     * @param Request $request
      * @param null $default
      * @return Null_
      */
-    protected function handleResponse(Response $response, Request $request, $default = null) : Null_
+    protected function handleResponse(Response $response, $default = null) : Null_
     {
         switch ($response->getStatusCode()) {
             case 404:
@@ -45,15 +51,14 @@ class Endpoints
     }
 
     /**
-     * @param array $data
+     * @param object $data
      * @param $modelInstance
      * @return object
      * @throws \JsonMapper_Exception
      */
-    protected function hydrateOne(array $data, $modelInstance) : object
+    protected function hydrateOne(object $data, $modelInstance) : object
     {
-        $stdObject = (object) $data;
-        return $this->mapper->map($stdObject, $modelInstance);
+        return $this->mapper->map($data, $modelInstance);
     }
 
 

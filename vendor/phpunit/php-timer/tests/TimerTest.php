@@ -18,42 +18,14 @@ final class TimerTest extends TestCase
 {
     public function testCanBeStartedAndStopped(): void
     {
+        Timer::start();
+
         $this->assertIsFloat(Timer::stop());
     }
 
     public function testCanFormatTimeSinceStartOfRequest(): void
     {
         $this->assertStringMatchesFormat('%d:%d%s', Timer::timeSinceStartOfRequest());
-    }
-
-    /**
-     * @backupGlobals enabled
-     */
-    public function testCanFormatSinceStartOfRequestWhenRequestTimeIsNotAvailableAsFloat(): void
-    {
-        if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
-            unset($_SERVER['REQUEST_TIME_FLOAT']);
-        }
-
-        $this->assertStringMatchesFormat('%d:%d%s', Timer::timeSinceStartOfRequest());
-    }
-
-    /**
-     * @backupGlobals enabled
-     */
-    public function testCannotFormatTimeSinceStartOfRequestWhenRequestTimeIsNotAvailable(): void
-    {
-        if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
-            unset($_SERVER['REQUEST_TIME_FLOAT']);
-        }
-
-        if (isset($_SERVER['REQUEST_TIME'])) {
-            unset($_SERVER['REQUEST_TIME']);
-        }
-
-        $this->expectException(RuntimeException::class);
-
-        Timer::timeSinceStartOfRequest();
     }
 
     public function testCanFormatResourceUsage(): void
@@ -63,6 +35,7 @@ final class TimerTest extends TestCase
 
     /**
      * @dataProvider secondsToTimeStringProvider
+     * @testdox Can format $seconds as '$string'
      */
     public function testCanFormatSecondsAsString(string $string, float $seconds): void
     {
@@ -111,6 +84,7 @@ final class TimerTest extends TestCase
 
     /**
      * @dataProvider secondsToTimeShortStringProvider
+     * @testdox Can format $seconds as '$string'
      */
     public function testCanFormatSecondsAsShortString(string $string, float $seconds): void
     {
@@ -159,6 +133,7 @@ final class TimerTest extends TestCase
 
     /**
      * @dataProvider bytesProvider
+     * @testdox Can format $bytes as '$string'
      */
     public function testCanFormatBytesAsString(string $string, float $bytes): void
     {
@@ -178,5 +153,33 @@ final class TimerTest extends TestCase
             ['3.00 GB', 3 * 1073741824],
             ['3.50 GB', 3.5 * 1073741824],
         ];
+    }
+
+    /**
+     * @backupGlobals enabled
+     * @testdox Cannot access time since start of request when $_SERVER['REQUEST_TIME_FLOAT'] is not set
+     */
+    public function testCannotAccessTimeSinceStartOfRequestWhenServerRequestTimeFloatIsNotSet(): void
+    {
+        unset($_SERVER['REQUEST_TIME_FLOAT']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot determine time at which the request started because $_SERVER[\'REQUEST_TIME_FLOAT\'] is not available');
+
+        Timer::timeSinceStartOfRequest();
+    }
+
+    /**
+     * @backupGlobals enabled
+     * @testdox Cannot access time since start of request when $_SERVER['REQUEST_TIME_FLOAT'] is not of type float
+     */
+    public function testCannotAccessTimeSinceStartOfRequestWhenServerRequestTimeFloatIsNotFloat(): void
+    {
+        $_SERVER['REQUEST_TIME_FLOAT'] = 'string';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot determine time at which the request started because $_SERVER[\'REQUEST_TIME_FLOAT\'] is not of type float');
+
+        Timer::timeSinceStartOfRequest();
     }
 }

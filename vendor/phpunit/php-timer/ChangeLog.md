@@ -2,6 +2,21 @@
 
 All notable changes are documented in this file using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [3.1.4] - 2020-04-20
+
+### Changed
+
+* `Timer::timeSinceStartOfRequest()` no longer tries `$_SERVER['REQUEST_TIME']` when `$_SERVER['REQUEST_TIME_FLOAT']` is not available (`$_SERVER['REQUEST_TIME_FLOAT']` was added in PHP 5.4 and this library requires PHP 7.3)
+* Improved exception messages when `$_SERVER['REQUEST_TIME_FLOAT']` is not set or is not of type `float`
+
+### Changed
+
+## [3.1.3] - 2020-04-20
+
+### Changed
+
+* `Timer::timeSinceStartOfRequest()` now raises an exception if `$_SERVER['REQUEST_TIME_FLOAT']` does not contain a `float` (or `$_SERVER['REQUEST_TIME']` does not contain an `int`)
+
 ## [3.1.2] - 2020-04-17
 
 ### Changed
@@ -60,6 +75,8 @@ All notable changes are documented in this file using the [Keep a CHANGELOG](htt
 
 * This component is no longer supported on PHP 5.3, PHP 5.4, PHP 5.5, PHP 5.6, and PHP 7.0
 
+[3.1.4]: https://github.com/sebastianbergmann/diff/compare/3.1.3...3.1.4
+[3.1.3]: https://github.com/sebastianbergmann/diff/compare/3.1.2...3.1.3
 [3.1.2]: https://github.com/sebastianbergmann/diff/compare/3.1.1...3.1.2
 [3.1.1]: https://github.com/sebastianbergmann/diff/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/sebastianbergmann/diff/compare/3.0.0...3.1.0

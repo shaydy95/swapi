@@ -4,19 +4,24 @@
 namespace SwapiClient\Endpoints;
 
 
+use GuzzleHttp\Exception\RequestException;
 use SwapiClient\Models\Starship;
 
 class StarshipsEndpoint extends Endpoints
 {
-    public function get($id) : object
+    /**
+     * @param int $id
+     * @return object
+     * @throws \JsonMapper_Exception
+     */
+    public function get(int $id) : object
     {
-        $request = $this->http->createRequest("GET", sprintf("species/%d/", $id));
-        $response = $this->http->send($request);
-
-        if ($response->getStatusCode() == 200) {
-            return $this->hydrateOne($response->json(), new Starship());
+        try {
+            $response = $this->http->request("GET", sprintf("species/%d/", $id));
+            return $this->hydrateOne(json_decode($response->getBody()), new Starship());
+        } catch (RequestException $e) {
+            echo $e->getMessage() . "\n";
+            echo $e->getRequest()->getMethod();
         }
-
-        return $this->handleResponse($response, $request);
     }
 }

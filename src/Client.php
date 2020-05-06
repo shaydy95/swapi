@@ -4,12 +4,28 @@ namespace SwapiClient;
 
 
 use JsonMapper;
+use SwapiClient\Models\Character;
+use SwapiClient\Models\Planet;
+use SwapiClient\Models\Starship;
 
 class Client
 {
-    const VERSION = '1';
+    const API_URI = 'http://swapi.dev/api/';
 
+    /**
+     * @var Character
+     */
     protected $characters;
+
+    /**
+     * @var Planet
+     */
+    protected $planets;
+
+    /**
+     * @var Starship
+     */
+    protected $species;
 
     private $http;
 
@@ -22,16 +38,11 @@ class Client
 
     }
 
-    protected function createHttpClient()
+    public function createHttpClient()
     {
-        return new \Guzzle\Http\Client('http://swapi.dev/api/', [
-            'default' => [
-                'exceptions' => false,
-                'headers' => [
-                    'User-Agent' => sprintf('php-swapi/%s', static::VERSION),
-                    'Accept' => 'application/json',
-                ],
-            ],
+        return new \GuzzleHttp\Client([
+            'base_uri' => self::API_URI,
+            'default' => ['headers' => ['Accept' => 'application/json']],
         ]);
     }
 
@@ -68,7 +79,7 @@ class Client
      * @param bool $fresh
      * @return Endpoints\StarshipsEndpoint
      */
-    public function starship($fresh = false)
+    public function spaceship($fresh = false)
     {
         if (!isset($this->species) || $fresh) {
             $this->species = new Endpoints\StarshipsEndpoint($this->http, $this->mapper);
@@ -77,11 +88,10 @@ class Client
     }
 
 
-
     /**
-     * @param string $url
+     * @param $uri
      * @return object SWAPI Model
-     * @throws \UnexpectedValueException When given an unrecognised URI
+     * @throws \JsonMapper_Exception
      */
     public function getFromUri($uri)
     {
@@ -89,16 +99,10 @@ class Client
             switch (strtolower($matches[1])) {
                 case "characters":
                     return $this->characters()->get($matches[2]);
-                case "films":
-                    return $this->films()->get($matches[2]);
                 case "planets":
                     return $this->planets()->get($matches[2]);
-                case "species":
-                    return $this->species()->get($matches[2]);
-                case "starships":
-                    return $this->starships()->get($matches[2]);
-                case "vehicles":
-                    return $this->vehicles()->get($matches[2]);
+                case "starship":
+                    return $this->spaceship()->get($matches[2]);
             }
         }
 
